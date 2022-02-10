@@ -1,0 +1,7 @@
+{
+  "dir": "/mnt/disk/sync",
+  "script": "/sync.sh",
+  "ignore": [
+    "^(.*)/.verysync/(.*)$"
+  ]
+}
