@@ -20,7 +20,7 @@ import (
 
 var (
 	AppName          = "SyncWatcher"
-	AppVersion       = "v0.6.3"
+	AppVersion       = "v0.6.4"
 	AppAuthor        = "Yaott"
 	Debug            = false
 	SleepTime  uint8 = 1
@@ -33,6 +33,7 @@ var (
 	ParamLogFile    string
 	ParamDebug      bool
 	ParamIgnoreShow bool
+	ParamSyncFirst  bool
 )
 
 var (
@@ -54,6 +55,7 @@ func main() {
 	flag.BoolVar(&ParamVersion, "v", false, "Version")
 	flag.StringVar(&ParamConfigFile, "c", "config.json", "ConfigFile")
 	flag.BoolVar(&ParamIgnoreShow, "is", false, "IgnoreShow")
+	flag.BoolVar(&ParamSyncFirst, "s", false, "Sync Before Run")
 	flag.StringVar(&ParamLogFile, "l", "", "LogFile")
 	flag.BoolVar(&ParamDebug, "debug", false, "Debug")
 	flag.Usage = usage
@@ -165,9 +167,11 @@ func main() {
 		}
 	}()
 	func() {
-		Log(0, "Start to Sync...")
-		RunSyncShell()
-		Log(0, "Sync Finish!!")
+		if ParamSyncFirst {
+			Log(0, "Start to Sync...")
+			RunSyncShell()
+			Log(0, "Sync Finish!!")
+		}
 		for {
 			var (
 				DataSave    string
@@ -185,6 +189,7 @@ func main() {
 				default:
 					if DataSaveOld != DataSave {
 						SyncLock = true
+						Log(0, "Check File(Dir) Change...")
 						Log(0, "Start to Sync...")
 						RunSyncShell()
 						Log(0, "Sync Finish!!")
@@ -219,6 +224,7 @@ Usage: `+AppName+` [*]
    -c {string}  ConfigFile(default: config.json)
    -l {string}  LogFile
    -is          IgnoreShow
+   -s           Sync Before Run
    -h           Show Help
    -v           Show Version
    -debug       Enable Debug
