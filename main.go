@@ -20,7 +20,7 @@ import (
 
 var (
 	AppName          = "SyncWatcher"
-	AppVersion       = "v0.6.4"
+	AppVersion       = "v0.6.6"
 	AppAuthor        = "Yaott"
 	Debug            = false
 	SleepTime  uint8 = 1
@@ -172,36 +172,28 @@ func main() {
 			RunSyncShell()
 			Log(0, "Sync Finish!!")
 		}
+		Log(0, "Watching...")
 		for {
-			var (
-				DataSave    string
-				DataSaveOld string
-				CleanTag    = 0
-			)
+			var DataSave string
 			for {
 				ContinueTag := false
 				BreakTag := false
 				select {
 				case data := <-SyncTag:
 					DataSave += data
+					time.Sleep(1 * time.Second)
 					ContinueTag = true
 					break
 				default:
-					if DataSaveOld != DataSave {
+					if len(DataSave) != 0 {
 						SyncLock = true
 						Log(0, "Check File(Dir) Change...")
 						Log(0, "Start to Sync...")
 						RunSyncShell()
 						Log(0, "Sync Finish!!")
+						Log(0, "Watching...")
 						SyncLock = false
-						CleanTag++
-						if CleanTag == 10 {
-							DataSaveOld = ""
-							DataSave = ""
-							CleanTag = 0
-						} else {
-							DataSaveOld = DataSave
-						}
+						DataSave = ""
 					}
 					BreakTag = true
 					break
