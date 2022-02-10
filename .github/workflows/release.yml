@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       GOOS: linux
-      GOARCH: amd64
+      GOARCH: arm64
       CGO_ENABLED: 0
     steps:
       - name: Checkout
@@ -27,7 +27,6 @@ jobs:
           go build -o $GITHUB_WORKSPACE/output/syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }}
           cd $GITHUB_WORKSPACE/output
           sha256sum syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }} > syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }}.sha256sum
-          cp $GITHUB_WORKSPACE/config.json ./
       - name: Release Ready
         run: |
           cd $GITHUB_WORKSPACE
