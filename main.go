@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,13 +15,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
 
 var (
 	AppName          = "SyncWatcher"
-	AppVersion       = "v0.6.6"
+	AppVersion       = "v0.6.7"
 	AppAuthor        = "Yaott"
 	Debug            = false
 	SleepTime  uint8 = 1
@@ -117,7 +119,7 @@ func main() {
 	if err != nil {
 		Log(-1, "Watch Dir Fail")
 	}
-	SyncTag := make(chan string, 100)
+	SyncTag := make(chan string, 1024)
 	go func() {
 		for {
 			select {
@@ -156,7 +158,7 @@ func main() {
 					default:
 					}
 					if RunTag {
-						SyncTag <- ev.Op.String() + " " + ev.Name
+						SyncTag <- strings.ReplaceAll(uuid.New().String(), "-", "")
 					}
 				}
 			case err := <-w.Errors:
@@ -180,8 +182,10 @@ func main() {
 				BreakTag := false
 				select {
 				case data := <-SyncTag:
-					DataSave += data
-					time.Sleep(1 * time.Second)
+					DataSave = data
+					if len(SyncTag) == 0 {
+						time.Sleep(1 * time.Second)
+					}
 					ContinueTag = true
 					break
 				default:
