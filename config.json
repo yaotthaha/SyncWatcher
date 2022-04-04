@@ -1,7 +1,12 @@
 {
-  "dir": "/mnt/disk/sync",
-  "script": "/sync.sh",
-  "ignore": [
-    "^(.*)/.verysync/(.*)$"
+  "watch_settings": [
+    {
+      "dir": "/mnt/disk/sync",
+      "script": "/sync.sh",
+      "ignore": [
+        "^(.*)/.verysync/(.*)$"
+      ],
+      "sync_first": false
+    }
   ]
 }
