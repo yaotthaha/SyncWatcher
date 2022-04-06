@@ -55,18 +55,20 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 		MainCancel()
 		return
 	}
-	func() {
-		Env := make(map[string]string)
-		Env["syncdir"] = CFG.Dir
-		Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg, Env)
-		StdoutBytes, _ := ioutil.ReadAll(Stdout)
-		StderrBytes, _ := ioutil.ReadAll(Stderr)
-		if err != nil {
-			Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
-		} else {
-			Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
-		}
-	}()
+	if CFG.SyncFirst {
+		func() {
+			Env := make(map[string]string)
+			Env["syncdir"] = CFG.Dir
+			Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg, Env)
+			StdoutBytes, _ := ioutil.ReadAll(Stdout)
+			StderrBytes, _ := ioutil.ReadAll(Stderr)
+			if err != nil {
+				Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+			} else {
+				Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+			}
+		}()
+	}
 	RunLock := sync.Mutex{}
 	Log(0, "Watching...")
 	for {
