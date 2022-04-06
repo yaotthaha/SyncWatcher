@@ -14,7 +14,7 @@ import (
 
 var (
 	AppName    = "SyncWatcher"
-	AppVersion = "v1.0.0-build-1"
+	AppVersion = "v1.0.0-build-2"
 	AppAuthor  = "Yaott"
 )
 
@@ -31,13 +31,12 @@ var (
 )
 
 var Params struct {
-	Help         bool
-	Version      bool
-	Debug        bool
-	Config       string
-	LogFile      string
-	Start        bool
-	interruptTag bool
+	Help    bool
+	Version bool
+	Debug   bool
+	Config  string
+	LogFile string
+	Start   bool
 }
 
 func init() {
@@ -128,16 +127,9 @@ func Log(Level int, Message ...interface{}) {
 }
 
 func SetupCloseHandler() {
-	c := make(chan os.Signal, 2)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		if Params.interruptTag {
-			Log(0, "Program has started the end function")
-		} else {
-			Params.interruptTag = true
-			Log(1, "OS Interrupt")
-			MainCancel()
-		}
-	}()
+	<-c
+	Log(1, "OS Interrupt")
+	MainCancel()
 }

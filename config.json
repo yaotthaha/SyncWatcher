@@ -1,4 +1,6 @@
 {
+  "terminal": "bash",
+  "terminal_arg": "-c",
   "watch_settings": [
     {
       "dir": "/mnt/disk/sync",

@@ -9,8 +9,8 @@ import (
 )
 
 type ConfigReadStruct struct {
-	Terminal      string
-	TerminalArg   string
+	Terminal      string                         `json:"terminal"`
+	TerminalArg   string                         `json:"terminal_arg"`
 	WatchSettings []ConfigReadWatchSettingStruct `json:"watch_settings"`
 }
 

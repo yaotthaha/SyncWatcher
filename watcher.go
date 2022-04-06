@@ -60,23 +60,15 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 		StdoutBytes, _ := ioutil.ReadAll(Stdout)
 		StderrBytes, _ := ioutil.ReadAll(Stderr)
 		if err != nil {
-			Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", StdoutBytes, "Stderr:", StderrBytes)
+			Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
 		} else {
-			Log(2, "run command `"+CFG.Script+"`", "Stdout:", StdoutBytes, "Stderr:", StderrBytes)
+			Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
 		}
 	}()
 	RunLock := sync.Mutex{}
 	for {
 		select {
 		case event := <-w.Events:
-			switch len(w.Events) {
-			case 0:
-			case 1:
-				<-time.After(500 * time.Millisecond)
-				continue
-			default:
-				continue
-			}
 			RunTag := false
 			switch event.Op {
 			case fsnotify.Write: // Write File
@@ -119,18 +111,26 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 			default:
 			}
 			if RunTag {
-				if RunLock.TryLock() {
-					go func() {
-						defer RunLock.Unlock()
-						Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg)
-						StdoutBytes, _ := ioutil.ReadAll(Stdout)
-						StderrBytes, _ := ioutil.ReadAll(Stderr)
-						if err != nil {
-							Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", StdoutBytes, "Stderr:", StderrBytes)
-						} else {
-							Log(2, "run command `"+CFG.Script+"`", "Stdout:", StdoutBytes, "Stderr:", StderrBytes)
-						}
-					}()
+				switch len(w.Events) {
+				case 0:
+					if RunLock.TryLock() {
+						go func() {
+							defer RunLock.Unlock()
+							Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg)
+							StdoutBytes, _ := ioutil.ReadAll(Stdout)
+							StderrBytes, _ := ioutil.ReadAll(Stderr)
+							if err != nil {
+								Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+							} else {
+								Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+							}
+						}()
+					}
+				case 1:
+					<-time.After(1 * time.Second)
+					continue
+				default:
+					continue
 				}
 			}
 		case <-MainCtx.Done():
