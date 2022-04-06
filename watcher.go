@@ -68,6 +68,7 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 		}
 	}()
 	RunLock := sync.Mutex{}
+	Log(0, "Watching...")
 	for {
 		select {
 		case event := <-w.Events:
@@ -118,6 +119,7 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 					if RunLock.TryLock() {
 						go func() {
 							defer RunLock.Unlock()
+							Log(0, "Run Script", CFG.Script)
 							Env := make(map[string]string)
 							Env["syncdir"] = CFG.Dir
 							Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg, Env)
@@ -128,6 +130,7 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 							} else {
 								Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
 							}
+							Log(0, "Run Script", CFG.Script, "Finish")
 						}()
 					}
 				case 1:

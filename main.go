@@ -14,7 +14,7 @@ import (
 
 var (
 	AppName    = "SyncWatcher"
-	AppVersion = "v1.0.0-build-3"
+	AppVersion = "v1.0.0-build-4"
 	AppAuthor  = "Yaott"
 )
 
