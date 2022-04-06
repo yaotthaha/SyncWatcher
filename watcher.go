@@ -56,7 +56,9 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 		return
 	}
 	func() {
-		Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg)
+		Env := make(map[string]string)
+		Env["syncdir"] = CFG.Dir
+		Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg, Env)
 		StdoutBytes, _ := ioutil.ReadAll(Stdout)
 		StderrBytes, _ := ioutil.ReadAll(Stderr)
 		if err != nil {
@@ -116,7 +118,9 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 					if RunLock.TryLock() {
 						go func() {
 							defer RunLock.Unlock()
-							Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg)
+							Env := make(map[string]string)
+							Env["syncdir"] = CFG.Dir
+							Stdout, Stderr, err := CommandRun(CFG.Script, Terminal, TerminalArg, Env)
 							StdoutBytes, _ := ioutil.ReadAll(Stdout)
 							StderrBytes, _ := ioutil.ReadAll(Stderr)
 							if err != nil {
