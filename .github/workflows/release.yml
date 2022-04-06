@@ -2,9 +2,7 @@ name: Build and Release
 
 on:
   workflow_dispatch:
-  watch:
-    types: started
-    inputs:
+   inputs:
       version:
         description: 'Version'
         required: false
