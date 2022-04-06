@@ -56,6 +56,7 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 		return
 	}
 	if CFG.SyncFirst {
+		Log(0, "Run First:", CFG.Script)
 		func() {
 			Env := make(map[string]string)
 			Env["syncdir"] = CFG.Dir
@@ -68,6 +69,7 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 				Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
 			}
 		}()
+		Log(0, "Run First:", CFG.Script, "Finish")
 	}
 	RunLock := sync.Mutex{}
 	Log(0, "Watching...")
