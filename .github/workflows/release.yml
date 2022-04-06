@@ -1,0 +1,51 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+  watch:
+    types: started
+    inputs:
+      version:
+        description: 'Version'
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+    env:
+      GOOS: linux
+      GOARCH: arm64
+      CGO_ENABLED: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17.7
+
+      - name: Build
+        run: |
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          cd $GITHUB_WORKSPACE
+          git checkout v1
+          if [ "${{ env.VERSION }}" = "" ]; then echo "VERSION=$(cat main.go | grep AppVersion | head -n1 | awk '{print $3}' | awk -F '"' '{print $2}') >> $GITHUB_ENV; fi
+          mkdir output
+          chmod 0777 output
+          go build -o $GITHUB_WORKSPACE/output/syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }} -ldflags "-X main.AppVersion=${{ env.VERSION }}"
+          cd $GITHUB_WORKSPACE/output
+          sha256sum syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }} > syncwatcher_${{ env.GOOS }}_${{ env.GOARCH }}.sha256sum
+
+      - name: Git push assets to "release" branch
+        run: |
+          cd $GITHUB_WORKSPACE/output || exit 1
+          git init
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "95022881+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release
+          git add .
+          git commit -m "Release ${{ env.VERSION }}"
+          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git push -f -u origin release
