@@ -66,7 +66,9 @@ func WatcherRun(CFG *ConfigWatchSettingStruct, Terminal, TerminalArg string) {
 			if err != nil {
 				Log(-2, "run command `"+CFG.Script+"` fail:", err, "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
 			} else {
-				Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+				if !CFG.IgnoreScriptOutput {
+					Log(2, "run command `"+CFG.Script+"`", "Stdout:", string(StdoutBytes), "Stderr:", string(StderrBytes))
+				}
 			}
 		}()
 		Log(0, "Run First:", CFG.Script, "Finish")

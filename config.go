@@ -15,10 +15,11 @@ type ConfigReadStruct struct {
 }
 
 type ConfigReadWatchSettingStruct struct {
-	Dir       string   `json:"dir"`
-	Script    string   `json:"script"`
-	Ignore    []string `json:"ignore"`
-	SyncFirst bool     `json:"sync_first"`
+	Dir                string   `json:"dir"`
+	Script             string   `json:"script"`
+	Ignore             []string `json:"ignore"`
+	SyncFirst          bool     `json:"sync_first"`
+	IgnoreScriptOutput bool     `json:"ignore_script_output"`
 }
 
 type ConfigStruct struct {
@@ -28,10 +29,11 @@ type ConfigStruct struct {
 }
 
 type ConfigWatchSettingStruct struct {
-	Dir       string
-	Script    string
-	Ignore    []*regexp.Regexp
-	SyncFirst bool
+	Dir                string
+	Script             string
+	Ignore             []*regexp.Regexp
+	SyncFirst          bool
+	IgnoreScriptOutput bool
 }
 
 func ReadConfig(FileName string) (ConfigStruct, error) {
@@ -83,6 +85,7 @@ func ReadConfig(FileName string) (ConfigStruct, error) {
 				WatchSetting.Ignore = append(WatchSetting.Ignore, Regexp)
 			}
 			WatchSetting.SyncFirst = v.SyncFirst
+			WatchSetting.IgnoreScriptOutput = v.IgnoreScriptOutput
 			ConfigReal.WatchSettings = append(ConfigReal.WatchSettings, WatchSetting)
 		}
 	} else {
